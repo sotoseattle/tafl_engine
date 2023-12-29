@@ -31,7 +31,7 @@ defmodule TaflEngine.Board do
     dead =
       board
       |> Enum.filter(fn {k, v} ->
-        Cell.surrounded?(k, enemies(whites, blacks, v.color), 2)
+        Cell.sandwiched?(k, enemies(whites, blacks, v.color), :one_side)
       end)
       |> Enum.map(fn {k, _} -> k end)
 

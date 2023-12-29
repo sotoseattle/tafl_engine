@@ -33,41 +33,44 @@ defmodule CellTest do
   end
 
   describe "find if cell will die" do
-    test "pawn surrounded in 4 sides" do
+    test "pawn sandwiched in 4 sides" do
+      #      E
+      #   E  P  E
+      #      E
       enemies = Cell.expand_to_surrounding(Cell.cast(3, 3))
 
-      assert Cell.surrounded?(Cell.cast(3, 3), enemies, 1)
-      assert Cell.surrounded?(Cell.cast(3, 3), enemies, 2)
-      assert Cell.surrounded?(Cell.cast(3, 3), enemies, 3)
-      assert Cell.surrounded?(Cell.cast(3, 3), enemies, 4)
-      refute Cell.surrounded?(Cell.cast(3, 3), enemies, 5)
+      assert Cell.sandwiched?(Cell.cast(3, 3), enemies, :one_side)
+      assert Cell.sandwiched?(Cell.cast(3, 3), enemies, :two_sides)
     end
 
-    test "pawn surrounded in 2 sides" do
+    test "pawn sandwiched in 2 sides" do
+      #         E
+      #   E  P  E
+      #   E
       enemies = [Cell.cast(3, 4), Cell.cast(3, 2), Cell.cast(4, 4), Cell.cast(2, 2)]
 
-      assert Cell.surrounded?(Cell.cast(3, 3), enemies, 1)
-      assert Cell.surrounded?(Cell.cast(3, 3), enemies, 2)
-      refute Cell.surrounded?(Cell.cast(3, 3), enemies, 3)
-      refute Cell.surrounded?(Cell.cast(3, 3), enemies, 4)
+      assert Cell.sandwiched?(Cell.cast(3, 3), enemies, :one_side)
+      refute Cell.sandwiched?(Cell.cast(3, 3), enemies, :two_sides)
     end
 
-    test "pawn surrounded in 1 sides" do
+    test "pawn sandwiched in no sides" do
+      #         E
+      #   E  P
+      #   E     E
       enemies = [Cell.cast(2, 4), Cell.cast(3, 2), Cell.cast(4, 4), Cell.cast(2, 2)]
 
-      assert Cell.surrounded?(Cell.cast(3, 3), enemies, 1)
-      refute Cell.surrounded?(Cell.cast(3, 3), enemies, 2)
-      refute Cell.surrounded?(Cell.cast(3, 3), enemies, 3)
-      refute Cell.surrounded?(Cell.cast(3, 3), enemies, 4)
+      refute Cell.sandwiched?(Cell.cast(3, 3), enemies, :one_side)
+      refute Cell.sandwiched?(Cell.cast(3, 3), enemies, :two_sides)
     end
 
-    test "pawn on edge surrounded in 2 sides" do
+    test "pawn on edge not really sandwiched" do
+      #      E
+      #      P  E
+      #   -  -  -
       enemies = [Cell.cast(1, 4), Cell.cast(2, 3)]
 
-      assert Cell.surrounded?(Cell.cast(1, 3), enemies, 1)
-      assert Cell.surrounded?(Cell.cast(1, 3), enemies, 2)
-      refute Cell.surrounded?(Cell.cast(1, 3), enemies, 3)
-      refute Cell.surrounded?(Cell.cast(1, 3), enemies, 4)
+      refute Cell.sandwiched?(Cell.cast(1, 3), enemies, :one_side)
+      refute Cell.sandwiched?(Cell.cast(1, 3), enemies, :two_sides)
     end
   end
 end
