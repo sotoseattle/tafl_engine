@@ -1,7 +1,6 @@
 defmodule TaflEngine.Board do
-  alias TaflEngine.Cell
   alias TaflEngine.Setup
-  alias TaflEngine.Piece
+  alias TaflEngine.Movement
   alias TaflEngine.Cell
 
   @king_only Setup.king_positions()
@@ -11,10 +10,10 @@ defmodule TaflEngine.Board do
   end
 
   def move(board, from_coord, new_coord) do
-    with {:ok, piece} <- there_is_a_piece_to_move(Map.get(board, from_coord)),
-         {:ok, cell_path} <- there_is_a_path(from_coord, new_coord),
-         :ok <- path_is_unblocked(board, cell_path),
-         :ok <- destination_is_available(piece, new_coord) do
+    with {:ok, piece} <- Movement.there_is_a_piece_to_move(Map.get(board, from_coord)),
+         {:ok, cell_path} <- Movement.there_is_a_path(from_coord, new_coord),
+         :ok <- Movement.path_is_unblocked(board, cell_path),
+         :ok <- Movement.destination_is_available(piece, new_coord) do
       board
       |> Map.delete(from_coord)
       |> Map.put(new_coord, piece)
@@ -23,48 +22,40 @@ defmodule TaflEngine.Board do
     end
   end
 
-  def there_is_a_piece_to_move(%Piece{} = p), do: {:ok, p}
+  @doc """
+  remove from the board all the pawns that get killed
+  """
+  def remove_killed_pawns(board) do
+    [whites, blacks] = [team(board, :white), team(board, :black)]
 
-  def there_is_a_piece_to_move(nil), do: {:error, :empty_cell}
+    dead =
+      board
+      |> Enum.filter(fn {k, v} ->
+        Cell.surrounded?(k, enemies(whites, blacks, v.color), 2)
+      end)
+      |> Enum.map(fn {k, _} -> k end)
 
-  def there_is_a_path(origin, origin), do: {:error, :no_move}
-
-  def there_is_a_path(%Cell{row: r, col: c1}, %Cell{row: r, col: c2}) do
-    hops = abs(c2 - c1)
-    delta = if c2 >= c1, do: 1, else: -1
-
-    path = 1..hops |> Enum.map(fn i -> Cell.cast(r, c1 + i * delta) end)
-
-    {:ok, path}
+    remove_pawn(board, dead)
   end
 
-  def there_is_a_path(%Cell{row: r1, col: c}, %Cell{row: r2, col: c}) do
-    hops = abs(r2 - r1)
-    delta = if r2 >= r1, do: 1, else: -1
+  defp remove_pawn(board, []), do: board
 
-    path = 1..hops |> Enum.map(fn i -> Cell.cast(r1 + i * delta, c) end)
-
-    {:ok, path}
+  defp remove_pawn(board, [c | cells]) do
+    remove_pawn(Map.delete(board, c), cells)
   end
 
-  def there_is_a_path(_, _), do: {:error, :diagonal_move}
-
-  def path_is_unblocked(board, cell_path) do
-    occupied = Map.keys(board)
-
-    if Enum.any?(cell_path, &(&1 in occupied)) do
-      {:error, :path_blocked}
-    else
-      :ok
-    end
+  @doc """
+  get all the pieces on the board of a color
+  """
+  def team(board, color) do
+    board
+    |> Enum.filter(fn {_k, v} -> v.color == color end)
+    |> Enum.map(fn {k, _} -> k end)
   end
 
-  def destination_is_available(%Piece{type: :king}, cell)
-      when cell in @king_only,
-      do: :ok
-
-  def destination_is_available(_piece, cell) when cell in @king_only,
-    do: {:error, :pawn_not_allowed}
-
-  def destination_is_available(_, _), do: :ok
+  @doc """
+  get the opposing pieces and those king landings that act as enemy
+  """
+  def enemies(_whites, blacks, :white), do: Enum.concat(blacks, @king_only)
+  def enemies(whites, _blacks, :black), do: Enum.concat(whites, @king_only)
 end

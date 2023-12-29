@@ -19,4 +19,26 @@ defmodule TaflEngine.Cell do
       err -> err
     end
   end
+
+  def surrounded?(cell, occupied, sides) do
+    cell
+    |> expand_to_surrounding()
+    |> Enum.reduce([], fn a, acc ->
+      if a in occupied, do: [a | acc], else: acc
+    end)
+    |> Enum.count() >=
+      sides
+  end
+
+  def expand_to_surrounding(%Cell{row: x, col: y}) do
+    [
+      Cell.new(x + 1, y),
+      Cell.new(x - 1, y),
+      Cell.new(x, y + 1),
+      Cell.new(x, y - 1)
+    ]
+    |> Enum.reduce([], fn {k, v}, acc ->
+      if k == :ok, do: [v | acc], else: acc
+    end)
+  end
 end
