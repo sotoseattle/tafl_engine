@@ -9,14 +9,18 @@ defmodule TaflEngine.Board do
     Setup.new_board()
   end
 
-  def move(board, from_coord, new_coord) do
+  def move(board, from_coord, new_coord, player) do
     with {:ok, piece} <- Movement.there_is_a_piece_to_move(Map.get(board, from_coord)),
+         :ok <- Movement.piece_belongs_to_player(piece, player),
          {:ok, cell_path} <- Movement.there_is_a_path(from_coord, new_coord),
          :ok <- Movement.path_is_unblocked(board, cell_path),
          :ok <- Movement.destination_is_available(piece, new_coord) do
-      board
-      |> Map.delete(from_coord)
-      |> Map.put(new_coord, piece)
+      new_board =
+        board
+        |> Map.delete(from_coord)
+        |> Map.put(new_coord, piece)
+
+      {:ok, new_board}
     else
       err -> err
     end
@@ -26,7 +30,7 @@ defmodule TaflEngine.Board do
   remove from the board all the pawns that get killed
   """
   def remove_killed_pawns(board) do
-    [royals, hunters] = [team(board, :white), team(board, :black)]
+    [royals, hunters] = [team(board, :royals), team(board, :hunters)]
 
     dead =
       board
@@ -56,6 +60,6 @@ defmodule TaflEngine.Board do
   @doc """
   get the opposing pieces and those king landings that act as enemy
   """
-  def enemies(_royals, hunters, :white), do: Enum.concat(hunters, @king_only)
-  def enemies(royals, _hunters, :black), do: Enum.concat(royals, @king_only)
+  def enemies(_royals, hunters, :royals), do: Enum.concat(hunters, @king_only)
+  def enemies(royals, _hunters, :hunters), do: Enum.concat(royals, @king_only)
 end

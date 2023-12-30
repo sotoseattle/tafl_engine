@@ -8,8 +8,8 @@ defmodule TaflEngine.Setup do
 
   def royals() do
     [{4, 4}, {4, 5}, {4, 6}, {5, 4}, {5, 6}, {6, 4}, {6, 5}, {6, 6}]
-    |> pawns(:white)
-    |> Map.put(Cell.cast(5, 5), Piece.new(:king, :white))
+    |> pawns(:royals)
+    |> Map.put(Cell.cast(5, 5), Piece.new(:king, :royals))
   end
 
   def hunters() do
@@ -31,7 +31,7 @@ defmodule TaflEngine.Setup do
       {6, 9},
       {5, 8}
     ]
-    |> pawns(:black)
+    |> pawns(:hunters)
   end
 
   def new_board() do

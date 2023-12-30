@@ -10,6 +10,10 @@ defmodule TaflEngine.Movement do
 
   def there_is_a_piece_to_move(nil), do: {:error, :empty_cell}
 
+  def piece_belongs_to_player(%Piece{color: player}, player), do: :ok
+
+  def piece_belongs_to_player(_, _), do: {:error, :piece_does_not_belong_to_player}
+
   def there_is_a_path(origin, origin), do: {:error, :no_move}
 
   def there_is_a_path(%Cell{row: r, col: c1}, %Cell{row: r, col: c2}) do

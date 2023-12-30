@@ -2,7 +2,7 @@ defmodule TaflEngine.Piece do
   alias __MODULE__
 
   @piece_types [:pawn, :king]
-  @piece_colors [:black, :white]
+  @piece_colors [:hunters, :royals]
 
   @enforce_keys [:type, :color]
   defstruct [:type, :color]
