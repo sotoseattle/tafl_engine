@@ -11,7 +11,7 @@ defmodule TaflEngine.Game do
     {:via, Registry, {Registry.Game, name}}
   end
 
-  def start_link(name) do
+  def start_link(name) when is_binary(name) do
     GenServer.start_link(__MODULE__, name, name: via_tuple(name))
   end
 

@@ -10,9 +10,17 @@ defmodule TaflEngine.GameSupervisor do
   def start_game(name) do
     # If MyWorker is not using the new child specs, we need to pass a map:
     # spec = %{id: MyWorker, start: {MyWorker, :start_link, [foo, bar, baz]}}
-    spec = %{id: Game, start: {Game, :start_link, [name: name]}}
+    # spec = %{id: Game, start: {Game, :start_link, [name: name]}}
 
-    DynamicSupervisor.start_child(__MODULE__, spec)
+    # child_spec = {Game, name: name}
+
+    child_spec = %{
+      id: TaflEngine.Game,
+      restart: :transient,
+      start: {TaflEngine.Game, :start_link, [name: name]}
+    }
+
+    DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
   def stop_game(name) do
