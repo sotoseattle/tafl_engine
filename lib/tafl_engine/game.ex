@@ -3,12 +3,16 @@ defmodule TaflEngine.Game do
   alias TaflEngine.Cell
   alias TaflEngine.Board
 
-  use GenServer
+  use GenServer, start: {__MODULE__, :start_link, []}, restart: :transient
 
   @players [:hunters, :royals]
 
+  def via_tuple(name) do
+    {:via, Registry, {Registry.Game, name}}
+  end
+
   def start_link(name) do
-    GenServer.start_link(__MODULE__, name, [])
+    GenServer.start_link(__MODULE__, name, name: via_tuple(name))
   end
 
   def add_new_player(game, name) when is_binary(name) do

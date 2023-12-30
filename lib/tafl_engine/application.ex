@@ -10,6 +10,8 @@ defmodule TaflEngine.Application do
     children = [
       # Starts a worker by calling: TaflEngine.Worker.start_link(arg)
       # {TaflEngine.Worker, arg}
+      {Registry, keys: :unique, name: Registry.Game},
+      TaflEngine.GameSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
