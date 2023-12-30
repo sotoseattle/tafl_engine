@@ -64,5 +64,17 @@ defmodule BoardTest do
 
       assert Board.remove_killed_pawns(b) == b
     end
+
+    test "a massacre (because we first find dead, and then we kill them)", %{pawn: p} do
+      black_pawn = %{p | color: :black}
+
+      b = %{
+        Cell.cast(1, 2) => bp,
+        Cell.cast(1, 3) => p,
+        Cell.cast(1, 4) => %{p | color: :black}
+      }
+
+      assert Board.remove_killed_pawns(b) == %{Cell.cast(1, 4) => %{p | color: :black}}
+    end
   end
 end

@@ -26,12 +26,12 @@ defmodule TaflEngine.Board do
   remove from the board all the pawns that get killed
   """
   def remove_killed_pawns(board) do
-    [whites, blacks] = [team(board, :white), team(board, :black)]
+    [royals, hunters] = [team(board, :white), team(board, :black)]
 
     dead =
       board
       |> Enum.filter(fn {k, v} ->
-        Cell.sandwiched?(k, enemies(whites, blacks, v.color), :one_side)
+        Cell.sandwiched?(k, enemies(royals, hunters, v.color), :one_side)
       end)
       |> Enum.map(fn {k, _} -> k end)
 
@@ -56,6 +56,6 @@ defmodule TaflEngine.Board do
   @doc """
   get the opposing pieces and those king landings that act as enemy
   """
-  def enemies(_whites, blacks, :white), do: Enum.concat(blacks, @king_only)
-  def enemies(whites, _blacks, :black), do: Enum.concat(whites, @king_only)
+  def enemies(_royals, hunters, :white), do: Enum.concat(hunters, @king_only)
+  def enemies(royals, _hunters, :black), do: Enum.concat(royals, @king_only)
 end

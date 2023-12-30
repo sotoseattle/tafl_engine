@@ -6,13 +6,13 @@ defmodule TaflEngine.Setup do
     1..9
   end
 
-  def white_team() do
+  def royals() do
     [{4, 4}, {4, 5}, {4, 6}, {5, 4}, {5, 6}, {6, 4}, {6, 5}, {6, 6}]
     |> pawns(:white)
     |> Map.put(Cell.cast(5, 5), Piece.new(:king, :white))
   end
 
-  def black_team() do
+  def hunters() do
     [
       {1, 4},
       {1, 5},
@@ -35,7 +35,7 @@ defmodule TaflEngine.Setup do
   end
 
   def new_board() do
-    Map.merge(white_team(), black_team())
+    Map.merge(royals(), hunters())
   end
 
   def king_positions() do
