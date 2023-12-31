@@ -6,6 +6,7 @@ defmodule TaflEngine.Game do
   use GenServer, start: {__MODULE__, :start_link, []}, restart: :transient
 
   @players [:hunters, :royals]
+  @timeout 60 * 60 * 24 * 1000
 
   def via_tuple(name) do
     {:via, Registry, {Registry.Game, name}}
@@ -36,7 +37,7 @@ defmodule TaflEngine.Game do
   def init(name) do
     royals = %{name: name}
     hunters = %{name: nil}
-    {:ok, %{royals: royals, hunters: hunters, board: Board.new(), rules: %Rules{}}}
+    {:ok, %{royals: royals, hunters: hunters, board: Board.new(), rules: %Rules{}}, @timeout}
   end
 
   def handle_call({:add_player, name}, _from, state) do
@@ -76,13 +77,20 @@ defmodule TaflEngine.Game do
     end
   end
 
+  def handle_info(:timeout, state) do
+    {:stop, {:shutdown, :timeout}, state}
+  end
+
   defp update_hunters_name(state, name), do: put_in(state.hunters.name, name)
 
   defp update_rules(state, rules), do: %{state | rules: rules}
 
   defp update_board(state, board), do: %{state | board: board}
 
-  defp reply_success(state, reply), do: {:reply, reply, state}
+  defp reply_success(state, reply) do
+    :ets.insert(:game_state, {})
+    {:reply, reply, state, @timeout}
+  end
 
   defp flip_players(state) do
     %{state | royals: state.hunters, hunters: state.royals}
