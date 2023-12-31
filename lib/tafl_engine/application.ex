@@ -14,6 +14,8 @@ defmodule TaflEngine.Application do
       TaflEngine.GameSupervisor
     ]
 
+    :ets.new(:game_state, [:public, :named_table])
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: TaflEngine.Supervisor]
