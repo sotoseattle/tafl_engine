@@ -35,9 +35,9 @@ defmodule TaflEngine.Game do
   ######################################################
 
   def init(name) do
-    royals = %{name: name}
-    hunters = %{name: nil}
-    {:ok, %{royals: royals, hunters: hunters, board: Board.new(), rules: %Rules{}}, @timeout}
+    send(self(), {:set_state, name})
+
+    {:ok, fresh_state(name)}
   end
 
   def handle_call({:add_player, name}, _from, state) do
@@ -77,23 +77,48 @@ defmodule TaflEngine.Game do
     end
   end
 
+  def handle_info({:set_state, name}, _state) do
+    state =
+      case :ets.lookup(:game_state, name) do
+        [] -> fresh_state(name)
+        [{_key, state}] -> state
+      end
+
+    :ets.insert(:game_state, {name, state})
+
+    {:noreply, state, @timeout}
+  end
+
   def handle_info(:timeout, state) do
     {:stop, {:shutdown, :timeout}, state}
   end
 
-  defp update_hunters_name(state, name), do: put_in(state.hunters.name, name)
+  def terminate({:shutdown, :timeout}, state) do
+    :ets.delete(:game_state, state.owner)
+    :ok
+  end
+
+  def terminate(_, _), do: :ok
+
+  ######################################################
+
+  defp update_hunters_name(state, name), do: put_in(state.hunters, name)
 
   defp update_rules(state, rules), do: %{state | rules: rules}
 
   defp update_board(state, board), do: %{state | board: board}
 
   defp reply_success(state, reply) do
-    :ets.insert(:game_state, {})
+    :ets.insert(:game_state, {state.owner, state})
     {:reply, reply, state, @timeout}
   end
 
   defp flip_players(state) do
     %{state | royals: state.hunters, hunters: state.royals}
+  end
+
+  defp fresh_state(name) do
+    %{owner: name, royals: name, hunters: nil, board: Board.new(), rules: %Rules{}}
   end
 
   # defp gameboard(state), do: Map.get(state, :board)
