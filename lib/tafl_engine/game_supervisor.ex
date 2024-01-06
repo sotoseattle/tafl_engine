@@ -23,6 +23,19 @@ defmodule TaflEngine.GameSupervisor do
     |> GenServer.whereis()
   end
 
+  def list_open_games() do
+    DynamicSupervisor.which_children(__MODULE__)
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.map(&:sys.get_state(&1))
+    |> Enum.reduce([], fn s, acc ->
+      if s.rules.state == :initialized do
+        [s.owner | acc]
+      else
+        acc
+      end
+    end)
+  end
+
   ######################################################################
 
   def init(:ok) do
