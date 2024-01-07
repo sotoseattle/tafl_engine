@@ -36,6 +36,15 @@ defmodule TaflEngine.GameSupervisor do
     end)
   end
 
+  def find_game(player) do
+    DynamicSupervisor.which_children(__MODULE__)
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.map(&:sys.get_state(&1))
+    |> Enum.filter(fn x ->
+      x.royals == player || x.hunters == player
+    end)
+  end
+
   ######################################################################
 
   def init(:ok) do

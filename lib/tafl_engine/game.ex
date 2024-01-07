@@ -32,6 +32,10 @@ defmodule TaflEngine.Game do
     GenServer.call(game, {:move, player, {r1, c1}, {r2, c2}})
   end
 
+  def get_state(game) do
+    :sys.get_state(game)
+  end
+
   ######################################################
 
   def init(name) do
