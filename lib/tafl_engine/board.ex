@@ -39,7 +39,7 @@ defmodule TaflEngine.Board do
       end)
       |> Enum.map(fn {k, _} -> k end)
 
-    remove_pawn(board, dead)
+    {:ok, remove_pawn(board, dead)}
   end
 
   defp remove_pawn(board, []), do: board

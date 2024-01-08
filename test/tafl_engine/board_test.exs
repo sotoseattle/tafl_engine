@@ -56,13 +56,13 @@ defmodule BoardTest do
     test "a hunters pawn between a king's landing and a royals one, dies", %{pawn: p} do
       b = %{Cell.cast(1, 2) => %{p | color: :hunters}, Cell.cast(1, 3) => p}
 
-      assert Board.remove_killed_pawns(b) == %{Cell.cast(1, 3) => p}
+      assert Board.remove_killed_pawns(b) == {:ok, %{Cell.cast(1, 3) => p}}
     end
 
     test "a royals pawn between a king's landing and a royals one, lives", %{pawn: p} do
       b = %{Cell.cast(1, 2) => p, Cell.cast(1, 3) => p}
 
-      assert Board.remove_killed_pawns(b) == b
+      assert Board.remove_killed_pawns(b) == {:ok, b}
     end
 
     test "a massacre (because we first find dead, and then we kill them)", %{pawn: p} do
@@ -74,7 +74,7 @@ defmodule BoardTest do
         Cell.cast(1, 4) => hunters_pawn
       }
 
-      assert Board.remove_killed_pawns(b) == %{Cell.cast(1, 4) => hunters_pawn}
+      assert Board.remove_killed_pawns(b) == {:ok, %{Cell.cast(1, 4) => hunters_pawn}}
     end
   end
 end
