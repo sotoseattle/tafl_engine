@@ -39,7 +39,7 @@ defmodule TaflEngine.Setup do
   end
 
   def king_positions() do
-    [{1, 1}, {1, 9}, {9, 1}, {9, 9}, {5, 5}]
+    [{1, 1}, {1, 9}, {9, 1}, {9, 9}]
     |> Enum.map(fn {x, y} -> Cell.cast(x, y) end)
   end
 

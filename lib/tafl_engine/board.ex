@@ -35,7 +35,8 @@ defmodule TaflEngine.Board do
     dead =
       board
       |> Enum.filter(fn {k, v} ->
-        Cell.sandwiched?(k, enemies(royals, hunters, v.color), :one_side)
+        v.type == :pawn &&
+          Cell.sandwiched?(k, enemies(royals, hunters, v.color), :one_side)
       end)
       |> Enum.map(fn {k, _} -> k end)
 
@@ -46,6 +47,25 @@ defmodule TaflEngine.Board do
 
   defp remove_pawn(board, [c | cells]) do
     remove_pawn(Map.delete(board, c), cells)
+  end
+
+  def check_mate(board) do
+    king = Enum.find(board, fn {_k, v} -> v.type == :king end) |> elem(0)
+    hunters = team(board, :hunters)
+
+    king_safe?(king) || king_killed?(king, hunters) || :no_win
+  end
+
+  def king_safe?(king) do
+    if king in Setup.king_positions(), do: :win_royals, else: nil
+  end
+
+  def king_killed?(king, hunters) do
+    if Cell.sandwiched?(king, hunters, :two_sides) do
+      :win_hunters
+    else
+      nil
+    end
   end
 
   @doc """

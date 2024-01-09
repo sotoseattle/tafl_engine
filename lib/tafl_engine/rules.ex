@@ -24,7 +24,8 @@ defmodule TaflEngine.Rules do
   def check(%Rules{state: :hunters_turn} = rules, {:win_check, win_or_not}) do
     case win_or_not do
       :no_win -> {:ok, rules}
-      :win -> {:ok, %Rules{rules | state: :game_over}}
+      :win_royals -> {:ok, %Rules{rules | state: :game_over_royals_win}}
+      :win_hunters -> {:ok, %Rules{rules | state: :game_over_hunters_win}}
     end
   end
 
@@ -37,7 +38,8 @@ defmodule TaflEngine.Rules do
   def check(%Rules{state: :royals_turn} = rules, {:win_check, win_or_not}) do
     case win_or_not do
       :no_win -> {:ok, rules}
-      :win -> {:ok, %Rules{rules | state: :game_over}}
+      :win_royals -> {:ok, %Rules{rules | state: :game_over_royals_win}}
+      :win_hunters -> {:ok, %Rules{rules | state: :game_over_hunters_win}}
     end
   end
 

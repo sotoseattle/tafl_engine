@@ -32,6 +32,7 @@ defmodule GameTest do
              {:error, :pawn_not_allowed}
 
     assert Game.move_piece(g, :hunters, {9, 6}, {9, 8}) == :ok
+
     assert get_rules_state(g) == :royals_turn
   end
 

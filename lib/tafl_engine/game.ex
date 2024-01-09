@@ -72,6 +72,7 @@ defmodule TaflEngine.Game do
          {:ok, from_coord} <- Cell.new(r1, c1),
          {:ok, new_coord} <- Cell.new(r2, c2),
          {:ok, board} <- Board.move(state.board, from_coord, new_coord, player),
+         {:ok, rules} <- Rules.check(rules, {:win_check, Board.check_mate(board)}),
          {:ok, board} <- Board.remove_killed_pawns(board) do
       state
       |> update_board(board)

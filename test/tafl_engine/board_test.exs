@@ -46,9 +46,6 @@ defmodule BoardTest do
       destin = Cell.cast(5, 3)
 
       assert Board.move(%{origin => p}, origin, destin, :royals) == {:ok, %{destin => p}}
-
-      assert Board.move(%{origin => p}, origin, Cell.cast(5, 5), :royals) ==
-               {:error, :pawn_not_allowed}
     end
   end
 
